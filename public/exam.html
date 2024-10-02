@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Sharing Example</title>
+</head>
+<body>
+
+    <h1>Artwork Title</h1>
+    <p>This is a beautiful piece of artwork.</p>
+
+    <!-- Social Media Share Buttons -->
+    <div id="share-buttons">
+        <button id="facebook-share">Share on Facebook</button>
+        <button id="twitter-share">Share on Twitter</button>
+    </div>
+
+    <script>
+        const artworkTitle = "Beautiful Artwork"; // Title of the artwork
+        const artworkUrl = "https://your-exhibition-url.com/artwork"; // Replace with your actual URL
+
+        // Facebook share button
+        document.getElementById('facebook-share').addEventListener('click', function() {
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(artworkUrl)}`;
+            window.open(facebookUrl, '_blank');
+        });
+
+        // Twitter share button
+        document.getElementById('twitter-share').addEventListener('click', function() {
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(artworkTitle)}&url=${encodeURIComponent(artworkUrl)}`;
+            window.open(twitterUrl, '_blank');
+        });
+    </script>
+
+</body>
+</html>

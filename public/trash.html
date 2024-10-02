@@ -1,0 +1,91 @@
+<!-- <style>
+      .hero {
+        width: 100%;
+        height: 550px;
+        position: relative;
+        color: #fff;
+        overflow: hidden;
+      }
+
+      .image-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        /* background-image: linear-gradient(
+            rgba(21, 21, 22, 0.512),
+            rgba(50, 51, 53, 0.612)
+          ),
+          url(images/art1.jpeg); */
+        background-size: cover;
+        /* background-position: center; */
+        background-position: 50% 50%;
+        /* object-position: 8% 95%; */
+        color: #fff;
+        overflow: hidden;
+        object-fit: cover;
+        transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+        transform: scaleY(1);
+        opacity: 1;
+      }
+
+      .content {
+        position: relative;
+        z-index: 1;
+        padding: 12px;
+      }
+      .hero .image-container.fade-out {
+        opacity: 0;
+        transform: scaleY(1.2);
+      }
+
+      .hero .image-container.fade-in {
+        opacity: 1;
+        transform: scaleY(1);
+      }
+    </style> -->
+
+<!-- ------------------------------------------------------------- -->
+<!-- <script>
+    const images = [
+      "url(images/art1.jpeg)",
+      "url(images/art2.jpeg)",
+      "url(images/art3.jpeg)",
+      "url(images/art4.jpg)",
+      "url(images/art5.jpeg)",
+      "url(images/art6.jpeg)",
+      "url(images/art7.jpeg)",
+      "url(images/art8.jpeg)",
+      "url(images/art9.jpeg)",
+      "url(images/art10.jpeg)",
+      "url(images/art11.jpeg)",
+      "url(images/art12.jpeg)",
+      "url(images/art13.jpeg)",
+      "url(images/art14.jpg)",
+      "url(images/art15.jpg)",
+    ];
+
+    let currentIndex = 0;
+    const heroElement = document.querySelector(".image-container");
+    const intervalTime = 5000;
+
+    function changeBackgroundImg() {
+      heroElement.classList.add("fade-out");
+
+      setTimeout(() => {
+        heroElement.style.backgroundImage = `linear-gradient(
+            rgba(21, 21, 22, 0.612),
+            rgba(50, 51, 53, 0.612)
+          ), ${images[currentIndex]}`;
+
+        heroElement.classList.remove("fade-out");
+        heroElement.classList.add("fade-in");
+
+        heroElement.style.transition = "background-image 1s ease-in-out";
+
+        currentIndex = (currentIndex + 1) % images.length;
+      }, 1000);
+    }
+
+    setInterval(changeBackgroundImg, intervalTime);
+    changeBackgroundImg();
+  </script> -->
