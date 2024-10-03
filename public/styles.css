@@ -1,0 +1,16 @@
+/* nav and stickly class at the same time */
+.nav.sticky {
+  position: fixed;
+  background-color: rgb(116, 48, 81);
+  width: 100%;
+  top: 0;
+  margin-top: 0;
+  box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.1);
+  padding: 0;
+}
+
+.nav.sticky {
+  .header {
+    padding: 16px 0;
+  }
+}
