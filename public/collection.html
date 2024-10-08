@@ -9,7 +9,7 @@
   <body class="bg-[#fefcff]">
     <div class="nav mt-5">
       <nav
-        class="header bg-[#743051] flex justify-between items-center w-[85%] md:w-[70%] mx-auto p-4 px-12 shadow-md"
+        class="header bg-[#743051] flex justify-between items-center w-[85%] md:w-[70%] mx-auto p-4 px-6 md:px-12 shadow-md"
       >
         <a href="index.html">
           <h1 class="text-xl font-bold flex items-center gap-1 text-white">
@@ -17,8 +17,8 @@
             <span>ARTICA</span>
           </h1></a
         >
-        <span class="md:hidden"><img src="icons/menu.png" alt="" /></span>
-        <div class="relative hidden md:flex">
+        <span class="lg:hidden"><img src="icons/menu.png" alt="" /></span>
+        <div class="relative hidden lg:flex">
           <input
             type="text"
             placeholder="Search..."
@@ -28,9 +28,9 @@
             <img src="icons/search.png" class="w-7 absolute right-5 top-1.5" />
           </button>
         </div>
-        <ul class="hidden md:flex gap-10 text-white">
+        <ul class="hidden lg:flex gap-10 text-white">
           <li
-            class="opacity-90 hover:opacity-100 cursor-pointer hidden md:flex gap-1"
+            class="opacity-90 hover:opacity-100 cursor-pointer hidden lg:flex gap-1"
           >
             <a href="fav.html"> <img src="icons/heart.png" class="w-7" /></a>
             <!-- <span class="text-[17px] uppercase">Favorites</span> -->
@@ -52,7 +52,7 @@
           assumenda voluptas sed vero, accusamus beatae modi illum neque
         </h3> -->
 
-        <div
+        <!-- <div
           class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
         >
           <div class="flex flex-col gap-6">
@@ -314,6 +314,12 @@
               </figcaption>
             </figure>
           </div>
+        </div> -->
+
+        <div
+          class="artContainer grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 p-6"
+        >
+          <!-- Artworks will be appended here dynamically -->
         </div>
       </div>
 
@@ -518,4 +524,5 @@
   </body>
 
   <script type="module" src="scripts/index.js"></script>
+  <script type="module" src="scripts/collection.js"></script>
 </html>
