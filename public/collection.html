@@ -17,22 +17,23 @@
             <span>ARTICA</span>
           </h1></a
         >
-        <span class="lg:hidden"><img src="icons/menu.png" alt="" /></span>
+
         <div class="relative hidden lg:flex">
           <input
             type="text"
-            id="searchInput"
-            placeholder="Search for artworks, artists, etc."
+            id="searchInput1"
+            placeholder="Search for artworks, artists, date, etc."
             class="w-[400px] p-2 outline-none pl-6 rounded-full bg-white"
           />
-          <button id="searchButton">
+          <button id="searchButton1">
             <img src="icons/search.png" class="w-7 absolute right-5 top-1.5" />
           </button>
         </div>
-        <ul class="hidden lg:flex gap-10 text-white">
-          <li
-            class="opacity-90 hover:opacity-100 cursor-pointer hidden lg:flex gap-1"
-          >
+        <ul class="flex gap-4 lg:gap-10 text-white">
+          <li class="lg:hidden">
+            <img src="icons/sm-search.png" class="w-7" id="open-search" />
+          </li>
+          <li class="opacity-90 hover:opacity-100 cursor-pointer flex gap-1">
             <a href="fav.html"> <img src="icons/heart.png" class="w-7" /></a>
             <!-- <span class="text-[17px] uppercase">Favorites</span> -->
           </li>
@@ -40,7 +41,24 @@
       </nav>
     </div>
 
-    <section class="mb-20 mt-16" id="section--0">
+    <!-- sm-search -->
+    <div
+      class="relative flex lg:hidden bg-gray-200 w-[300px] p-4 mx-auto"
+      style="display: none"
+      id="sm-search"
+    >
+      <input
+        type="text"
+        id="searchInput2"
+        placeholder="Search for artworks, artists, date..."
+        class="w-full p-2 outline-none pl-6 rounded-full bg-white text-[13px]"
+      />
+      <button id="searchButton2">
+        <img src="icons/search.png" class="w-6 absolute right-7 top-[22px]" />
+      </button>
+    </div>
+
+    <section class="mb-20 mt-10" id="section--0">
       <!-- <div
         class= w-[85%]"md:w-[70%] mx-auto border-b-2 pb-3 border-b-black flex justify-between items-center"
       >

@@ -3,9 +3,12 @@ const limit = 50; // Number of artworks per page
 const totalArtworks = 1000; // Assuming you have around 1000 artworks
 const totalPages = Math.ceil(totalArtworks / limit); // Total number of pages
 const artContainer = document.querySelector(".artContainer"); // Ensure this is the correct selector
+const pageContent = document.querySelector(".pagination-controls");
 const prevPageButton = document.getElementById("prevPage");
 const nextPageButton = document.getElementById("nextPage");
 const pageInfo = document.getElementById("pageInfo");
+
+pageContent.style.display = "flex";
 
 // Function to fetch artworks for a specific page
 function fetchArtworks(page = 1) {
@@ -95,76 +98,118 @@ nextPageButton.addEventListener("click", () => changePage(currentPage + 1));
 fetchArtworks(currentPage);
 
 /////////////////////////////////////////////
-// const searchInput = document.getElementById("searchInput");
-// const searchButton = document.getElementById("searchButton");
+const searchInput1 = document.getElementById("searchInput1");
+const searchInput2 = document.getElementById("searchInput2");
+const searchButton1 = document.getElementById("searchButton1");
+const searchButton2 = document.getElementById("searchButton2");
 
-// // Function to handle search queries
-// function handleSearch() {
-//   const searchTerm = searchInput.value.trim();
+function fetchArtworkDetailsById(artworkId) {
+  return fetch(`https://api.artic.edu/api/v1/artworks/${artworkId}`)
+    .then((response) => response.json())
+    .then((data) => {
+      const artwork = data.data;
+      if (!artwork.image_id || !data.config || !data.config.iiif_url) {
+        return null; // Skip if image or config is missing
+      }
+      const imageUrl = `${data.config.iiif_url}/${artwork.image_id}/full/843,/0/default.jpg`;
+      return {
+        title: artwork.title || "No title available",
+        artist: artwork.artist_title || "Unknown artist",
+        date: artwork.date_display || "Date not available",
+        imageUrl: imageUrl,
+        id: artwork.id,
+      };
+    })
+    .catch((error) => {
+      console.error("Error fetching artwork details:", error);
+      return null;
+    });
+}
 
-//   if (searchTerm !== "") {
-//     // Perform search using the API with the search term
-//     fetch(`https://api.artic.edu/api/v1/artworks/search?q=${searchTerm}`)
-//       .then((response) => {
-//         if (!response.ok) {
-//           throw new Error("Network response was not ok");
-//         }
-//         return response.json();
-//       })
-//       .then((data) => {
-//         console.log(data); // Debug: Log the API response
-//         artContainer.innerHTML = ""; // Clear previous search results
+function handleSearch(inputField) {
+  // Get the value from the passed input field
+  const searchTerm = inputField.value.trim();
 
-//         if (!data.data || data.data.length === 0) {
-//           artContainer.innerHTML = "<p>No results found.</p>";
-//           return;
-//         }
+  if (searchTerm !== "") {
+    fetch(`https://api.artic.edu/api/v1/artworks/search?q=${searchTerm}`)
+      .then((response) => response.json())
+      .then(async (data) => {
+        artContainer.innerHTML = ""; // Clear previous search results
 
-//         // Render search results
-//         data.data.forEach((artwork) => {
-//           // Check if the necessary fields exist
-//           const title = artwork.title || "No title available";
-//           const artist = artwork.artist_title || "Unknown artist";
-//           const date = artwork.date_display || "Date not available";
+        if (!data.data || data.data.length === 0) {
+          artContainer.innerHTML = "<p>No results found.</p>";
+          return;
+        }
 
-//           // Check if there's an image_id or thumbnail image
-//           const imageId = artwork.image_id;
-//           const thumbnail = artwork.thumbnail ? artwork.thumbnail.lqip : null;
+        for (const artwork of data.data) {
+          const fullDetails = await fetchArtworkDetailsById(artwork.id);
 
-//           // Construct the image URL
-//           const baseUrl = data.config
-//             ? data.config.iiif_url
-//             : "https://www.artic.edu/iiif/2";
-//           let imageUrl = imageId
-//             ? `${baseUrl}/${imageId}/full/843,/0/default.jpg`
-//             : thumbnail ||
-//               "https://via.placeholder.com/600x270?text=No+Image+Available"; // Use thumbnail if available or a placeholder
+          if (fullDetails && fullDetails.imageUrl) {
+            const img = new Image();
+            img.src = fullDetails.imageUrl;
+            pageContent.style.display = "none";
 
-//           const artworkHtml = `
-//             <figure class="bg-white shadow-lg rounded-md overflow-hidden">
-//               <a href="artpage.html?id=${artwork.id}">
-//                 <img
-//                   src="${imageUrl}"
-//                   alt="${title}"
-//                   class="cursor-pointer hover:drop-shadow-xl hover:brightness-90 w-[600px] h-[270px] object-cover"
-//                 />
-//               </a>
-//               <figcaption class="pt-2 p-4">
-//                 <h3 class="text-[#743051] font-bold text-lg">${title}</h3>
-//                 <p class="text-gray-500">${artist}, ${date}</p>
-//               </figcaption>
-//             </figure>
-//           `;
-//           artContainer.innerHTML += artworkHtml;
-//         });
-//       })
-//       .catch((error) => {
-//         console.error("Error fetching search results:", error);
-//       });
-//   } else {
-//     alert("Please enter a search term.");
-//   }
-// }
+            img.onload = function () {
+              const artworkHtml = `
+                <figure class="bg-white shadow-lg rounded-md overflow-hidden">
+                  <a href="artpage.html?id=${fullDetails.id}">
+                    <img
+                      src="${fullDetails.imageUrl}"
+                      alt="${fullDetails.title}"
+                      class="cursor-pointer hover:drop-shadow-xl hover:brightness-90 w-[600px] h-[270px] object-cover"
+                    />
+                  </a>
+                  <figcaption class="pt-2 p-4">
+                    <h3 class="text-[#743051] font-bold text-lg">${fullDetails.title}</h3>
+                    <p class="text-gray-500">${fullDetails.artist}, ${fullDetails.date}</p>
+                  </figcaption>
+                </figure>
+              `;
+              artContainer.innerHTML += artworkHtml;
+            };
 
-// // Event listener for search button
-// searchButton.addEventListener("click", handleSearch);
+            img.onerror = function () {
+              console.log(
+                `Skipping artwork due to missing image: ${fullDetails.title}`
+              );
+            };
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching search results:", error);
+      });
+  } else {
+    alert("Please enter a search term.");
+  }
+}
+
+// Add event listeners to both buttons
+searchButton1.addEventListener("click", () => handleSearch(searchInput1));
+searchButton2.addEventListener("click", () => handleSearch(searchInput2));
+
+//
+
+const openSearch = document.getElementById("open-search");
+
+function searchReveal() {
+  openSearch.addEventListener("click", () => {
+    if (openSearch.src.endsWith("search.png")) {
+      document.getElementById("sm-search").style.display = "flex";
+      searchInput2.focus();
+      openSearch.src = "icons/sm-search-faded.png";
+    } else {
+      document.getElementById("sm-search").style.display = "none";
+      openSearch.src = "icons/sm-search.png";
+    }
+  });
+}
+
+searchReveal();
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+   
+    handleSearch(searchInput2)
+  }
+});
