@@ -59,14 +59,14 @@ function exhibitionArtworks() {
            <div
             class="flex flex-col lg:flex-row justify-between gap-5 md:gap-10 items-center"
           >
-            <div class="w-[50%]">
+            <div class="lg:w-[50%]">
               <img
                 src="${imageUrl}"
                 class="w-full h-[320px] object-cover"
                 alt="${artworkDetails.title}"
               />
             </div>
-            <div class="w-[50%]">
+            <div class="lg:w-[50%]">
               <h2 class="font-extrabold text-2xl text-[#743051]">
               ${artworkDetails.title}
               </h2>
