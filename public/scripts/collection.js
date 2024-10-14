@@ -58,6 +58,7 @@ function fetchArtworks(page = 1) {
             </figcaption>
           </figure>
         `;
+        // console.log(artwork.id);
         artContainer.innerHTML += artworkHtml;
       };
 
@@ -209,7 +210,6 @@ searchReveal();
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
-   
-    handleSearch(searchInput2)
+    handleSearch(searchInput2);
   }
 });

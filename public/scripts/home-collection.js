@@ -2,7 +2,7 @@ function exhibitionArtworks() {
   const details = document.querySelector(".exhibition-container");
 
   // Array of artwork IDs (replace these with the actual IDs of your choice)
-  const artworkIds = [16146, 269979, 65008];
+  const artworkIds = [16146, 566, 65008];
 
   // Array of custom descriptions for each artwork
   const customDescription = [
@@ -13,12 +13,12 @@ function exhibitionArtworks() {
     },
     {
       descriptions:
-        "Mitchell's The Third Decade (1968) embodies the experimental spirit of the 1960s. Using abstract forms and elements of sound, the work challenges traditional artistic boundaries and invites viewers to explore time, space, and expression.",
+        "This life cast of Abraham Lincoln, created by Leonard Wells Volk, captures the detailed likeness of Lincoln’s hands and face just before his election. The bronze cast offers a rare, intimate view of Lincoln during a key moment in his life.",
       date: "November 22, 2024 - November 30 2024,",
     },
     {
       descriptions:
-        "Paul Manship’s The Horses of Anahita (1942) showcases the powerful and graceful forms of horses, inspired by the ancient Persian goddess Anahita. The dynamic composition and elegant figures reflect Manship's classical influence, blending mythology with his signature Art Deco style.",
+        "Paul Manship's The Horses of Anahita (1942) showcases the powerful and graceful forms of horses, inspired by the ancient Persian goddess Anahita. The dynamic composition and elegant figures reflect Manship's classical influence, blending mythology with his signature Art Deco style.",
       date: "December 22, 2024 - December 30 2024,",
     },
   ];
@@ -80,7 +80,7 @@ function exhibitionArtworks() {
               <p class="pt-4">
               ${artworkDetails.customDescription}
               </p>
-              <a href="artpage.html"
+              <a href="artpage.html?id=${artworkId}"
                 ><button
                   class="my-6 p-3 px-8 border border-[#743051] text-[#743051] font-bold rounded text-sm hover:bg-[#743051] hover:text-white transition-all"
                 >

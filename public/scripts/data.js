@@ -1,20 +1,30 @@
+import { addToFavorites } from "./addToFav.js";
+
 const artData = document.querySelector(".artData");
 const similarArts = document.querySelector(".similarArts");
 
+function getProductIdFromUrl() {
+  const params = new URLSearchParams(window.location.search); // Parse query parameters
+  return params.get("id"); // Get the 'productId' from the URL
+}
+
+const productId = getProductIdFromUrl(); // Get the productId from the URL
+
 // Function to fetch artwork data by a given artwork ID
-function fetchData(artworkId) {
+function fetchData(productId) {
   const request = new XMLHttpRequest();
-  request.open("GET", `https://api.artic.edu/api/v1/artworks/${artworkId}`);
+  request.open("GET", `https://api.artic.edu/api/v1/artworks/${productId}`);
   request.send();
 
   request.addEventListener("load", function () {
     if (this.status === 404 || this.status === 403 || !this.responseText) {
       console.log("Data is incomplete! Trying another random ID...");
-      fetchRandomArtwork(); // Retry with another random ID
+      // fetchRandomArtwork(); // Retry with another random ID
       return;
     }
 
     const objectData = JSON.parse(this.responseText);
+    const matchingProduct = objectData.data;
 
     if (!objectData.data) {
       console.log("Data is incomplete!");
@@ -28,6 +38,7 @@ function fetchData(artworkId) {
     console.log(objectData);
 
     const artworkDetails = {
+      id: objectData.data.id || "Not available",
       title: objectData.data.title || "Not available",
       artistName: objectData.data.artist_title || "Not available",
       artistId: objectData.data.artist_id || "Not available",
@@ -54,7 +65,10 @@ function fetchData(artworkId) {
     // Log the extracted data
     console.log(artworkDetails);
 
-    const html = `
+    // Find the matching product in the products array using the productId
+
+    if (matchingProduct) {
+      const html = `
       <div class="flex flex-col lg:flex-row justify-between gap-10">
         <div class="flex justify-center mx-auto lg:w-[50%]">
           <img src="${imageUrl}" class="w-[400px] object-contain h-[400px]" />
@@ -75,9 +89,9 @@ function fetchData(artworkId) {
           <p> <span class="font-bold">ARTWORK_TYPE: </span> <span>  ${artworkDetails.artworkType} </span></p>
           <p> <span class="font-bold">MEDIUM: </span> <span>  ${artworkDetails.medium} </span></p>
           <div class="flex items-center gap-2">
-            <button class="bg-[#743051] rounded p-3 px-4 text-white my-5 text-sm font-semibold hover:shadow-xl">
+          <a href="fav.html?id=${productId}">  <button id="js-add-to-fav" class="bg-[#743051] rounded p-3 px-4 text-white my-5 text-sm font-semibold hover:shadow-xl"  data-product-id="${artworkDetails.id}">
               ADD TO FAVORITE
-            </button>
+            </button></a>
             <button class="bg-[#f5f5dc] p-2 hover:shadow-xl">
               <img src="icons/eye.png" class="w-7" />
             </button>
@@ -94,67 +108,80 @@ function fetchData(artworkId) {
       </div>
     `;
 
-    artData.innerHTML = html; // Insert artwork details into the page
+      artData.innerHTML = html; // Insert artwork details into the page
 
-    function stripHTML(html) {
-      let tempDiv = document.createElement("div");
-      tempDiv.innerHTML = html;
-      return (
-        tempDiv.textContent || tempDiv.innerText || "No description available"
-      );
-    }
+      const addToFavButton = document.getElementById("js-add-to-fav");
+      addToFavButton.addEventListener("click", () => {
+        const productId = addToFavButton.dataset.productId;
+        addToFavorites(productId, artworkDetails);
+      });
 
-    const descriptionTextLimit = artworkDetails.description; // Original HTML content
-    console.log(descriptionTextLimit.length);
-
-    const wordLimit = 60; // Number of words to display in the truncated version
-
-    const descriptionTextDiv = document.getElementById("description-text");
-    const seeMoreBtn = document.getElementById("see-more-btn");
-    seeMoreBtn.style.display = "none";
-
-    descriptionTextDiv.innerHTML = "No description available";
-
-    // Strip HTML tags to get plain text for truncation
-    const plainText = stripHTML(descriptionTextLimit);
-    const words = plainText.split(" ");
-
-    function displayText(isFullText = false) {
-      if (!isFullText && words.length > wordLimit) {
-        // Show truncated text
-        const truncatedText = words.slice(0, wordLimit).join(" ") + "...";
-        descriptionTextDiv.innerHTML = `<p>${truncatedText}</p>`;
-        seeMoreBtn.style.display = "block";
-        seeMoreBtn.innerText = "See More"; // Show the 'See More' button
-      } else {
-        // Show full text (HTML content)
-        descriptionTextDiv.innerHTML = descriptionTextLimit;
-
-        seeMoreBtn.innerText = "See Less"; // Toggle to 'See Less' button
+      function stripHTML(html) {
+        let tempDiv = document.createElement("div");
+        tempDiv.innerHTML = html;
+        return (
+          tempDiv.textContent || tempDiv.innerText || "No description available"
+        );
       }
-    }
 
-    // Initial display with truncated text
-    displayText();
+      const descriptionTextLimit = artworkDetails.description; // Original HTML content
+      console.log(descriptionTextLimit.length);
 
-    // Toggle between full and truncated text when the button is clicked
-    seeMoreBtn.addEventListener("click", function () {
-      if (seeMoreBtn.innerText === "See More") {
-        // Show full text
-        displayText(true);
-      } else {
-        // Revert back to truncated text
-        displayText(false);
+      const wordLimit = 60; // Number of words to display in the truncated version
+
+      const descriptionTextDiv = document.getElementById("description-text");
+      const seeMoreBtn = document.getElementById("see-more-btn");
+      seeMoreBtn.style.display = "none";
+
+      descriptionTextDiv.innerHTML = "No description available";
+
+      // Strip HTML tags to get plain text for truncation
+      const plainText = stripHTML(descriptionTextLimit);
+      const words = plainText.split(" ");
+
+      function displayText(isFullText = false) {
+        if (!isFullText && words.length > wordLimit) {
+          // Show truncated text
+          const truncatedText = words.slice(0, wordLimit).join(" ") + "...";
+          descriptionTextDiv.innerHTML = `<p>${truncatedText}</p>`;
+          seeMoreBtn.style.display = "block";
+          seeMoreBtn.innerText = "See More"; // Show the 'See More' button
+        } else {
+          // Show full text (HTML content)
+          descriptionTextDiv.innerHTML = descriptionTextLimit;
+
+          seeMoreBtn.innerText = "See Less"; // Toggle to 'See Less' button
+        }
       }
-    });
+
+      // Initial display with truncated text
+      displayText();
+
+      // Toggle between full and truncated text when the button is clicked
+      seeMoreBtn.addEventListener("click", function () {
+        if (seeMoreBtn.innerText === "See More") {
+          // Show full text
+          displayText(true);
+        } else {
+          // Revert back to truncated text
+          displayText(false);
+        }
+      });
+    }
   });
 }
 
-// Function to fetch a random artwork
-function fetchRandomArtwork() {
-  const randomId = Math.floor(Math.random() * 10000); // Random number between 0 and 9999
-  fetchData(randomId); // Try fetching the random artwork
-}
+fetchData(productId);
 
-// Fetch the first random artwork when the page loads
-fetchRandomArtwork();
+// // Function to fetch a random artwork
+// function fetchRandomArtwork() {
+//   const randomId = Math.floor(Math.random() * 10000); // Random number between 0 and 9999
+//   fetchData(randomId); // Try fetching the random artwork
+// }
+
+// // Fetch the first random artwork when the page loads
+// fetchRandomArtwork();
+
+document.getElementById("favorites").addEventListener("click", () => {
+  location.href = `fav.html?productId=${productId}`;
+});
