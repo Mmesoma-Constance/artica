@@ -1,4 +1,4 @@
-import { addToFavorites } from "./addToFavorite.js";
+import { addToFavorites } from "./addToFav.js";
 
 const artData = document.querySelector(".artData");
 const similarArts = document.querySelector(".similarArts");
@@ -89,11 +89,10 @@ function fetchData(productId) {
           <p> <span class="font-bold">ARTWORK_TYPE: </span> <span>  ${artworkDetails.artworkType} </span></p>
           <p> <span class="font-bold">MEDIUM: </span> <span>  ${artworkDetails.medium} </span></p>
           <div class="flex items-center gap-2">
-        
-           <button id="js-add-to-fav" class="bg-[#743051] rounded p-3 px-4 text-white my-5 text-sm font-semibold hover:shadow-xl"  data-product-id="${artworkDetails.id}">
+          <a href="fav.html?id=${productId}">  <button id="js-add-to-fav" class="bg-[#743051] rounded p-3 px-4 text-white my-5 text-sm font-semibold hover:shadow-xl"  data-product-id="${artworkDetails.id}">
               ADD TO FAVORITE
-            </button>
-            <button class="bg-[#f5f5dc] p-2 hover:shadow-xl" id="download-button">
+            </button></a>
+            <button class="bg-[#f5f5dc] p-2 hover:shadow-xl">
               <img src="icons/eye.png" class="w-7" />
             </button>
           </div>
@@ -111,22 +110,10 @@ function fetchData(productId) {
 
       artData.innerHTML = html; // Insert artwork details into the page
 
-      // Event listener for adding the artwork to favorites
-      document.addEventListener("click", function (event) {
-        if (event.target && event.target.id === "js-add-to-fav") {
-          const productId = event.target.getAttribute("data-product-id");
-
-          // Ensure that artworkDetails is available
-          const artworkToSave = {
-            id: productId,
-            title: artworkDetails.title,
-            artistName: artworkDetails.artistName,
-            date: artworkDetails.date,
-            imageUrl: artworkDetails.imageUrl,
-          };
-          // Call the function to add the artwork to favorites
-          addToFavorites(artworkToSave);
-        }
+      const addToFavButton = document.getElementById("js-add-to-fav");
+      addToFavButton.addEventListener("click", () => {
+        const productId = addToFavButton.dataset.productId;
+        addToFavorites(productId, artworkDetails);
       });
 
       function stripHTML(html) {
@@ -181,14 +168,129 @@ function fetchData(productId) {
         }
       });
     }
+
+    // Call another API to fetch other artworks by the same artist using artist_id
+    const artistArtworksRequest = new XMLHttpRequest();
+    artistArtworksRequest.open(
+      "GET",
+      `https://api.artic.edu/api/v1/artworks?artist_ids=${artworkDetails.artistId}`
+    );
+    artistArtworksRequest.send();
+
+    artistArtworksRequest.addEventListener("load", function () {
+      const artistArtworksData = JSON.parse(this.responseText);
+      const artworksByArtist = artistArtworksData.data;
+
+      if (artworksByArtist.length > 1) {
+        // Select the container where the slider should be inserted
+        const similarArtsContainer = document.querySelector(".similarArts");
+
+        // Insert the slider container HTML into the similarArts div
+        const artHTML = `
+      <div class="related-artworks-slider relative overflow-hidden">
+        <h1 class="font-bold text-xl text-[#743051] pb-4">RELATED ARTWORKS</h1>
+
+        <div
+          class="flex transition-transform duration-300 ease-in-out space-x-4"
+          id="slider"
+        >
+          <!-- Artworks will be dynamically inserted here -->
+        </div>
+
+        <!-- Slider navigation buttons -->
+        <button
+          id="prevBtn"
+          class="absolute top-1/2 left-0 bg-[#743051] text-white p-2 transform -translate-y-1/2 hover:bg-[#a0506d]"
+        >
+          Prev
+        </button>
+        <button
+          id="nextBtn"
+          class="absolute top-1/2 right-0 bg-[#743051] text-white p-2 transform -translate-y-1/2 hover:bg-[#a0506d]"
+        >
+          Next
+        </button>
+      </div>
+    `;
+
+        similarArtsContainer.innerHTML = artHTML; // Insert the slider HTML into the div
+
+        const slider = document.getElementById("slider");
+
+        // Loop through each artwork and display it in a flex item
+        artworksByArtist.forEach((artwork) => {
+          const imageId = artwork.image_id;
+          const iiifUrl = artistArtworksData.config.iiif_url;
+
+          // Construct the image URL for each artwork
+          const imageUrl = `${iiifUrl}/${imageId}/full/843,/0/default.jpg`;
+
+          // Insert the artwork's details into the HTML
+          const artItemHTML = `
+        <figure class="w-full sm:w-[30%] flex-shrink-0">
+          <a href="artpage.html">
+            <img src="${imageUrl}" class="h-[250px] object-cover w-full" />
+          </a>
+          <figcaption class="pt-2">
+            <h3 class="text-[#743051] font-bold">${artwork.title}</h3>
+            <p>${artwork.artist_display}, ${artwork.date_display}</p>
+          </figcaption>
+        </figure>
+      `;
+
+          // Append the generated HTML to the slider container
+          slider.insertAdjacentHTML("beforeend", artItemHTML);
+        });
+
+        // Slider JavaScript to handle previous and next buttons
+        let currentPosition = 0;
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        // Get slide width
+        function slideWidth() {
+          return slider.children[0].offsetWidth;
+        }
+
+        // Get the total number of slides
+        const totalSlides = slider.children.length;
+
+        // Get the number of visible slides in the slider's container
+        function visibleSlides() {
+          const sliderWidth = slider.offsetWidth;
+          return Math.floor(sliderWidth / slideWidth());
+        }
+
+        // Previous button click event
+        prevBtn.addEventListener("click", () => {
+          currentPosition = Math.max(currentPosition - slideWidth(), 0); // Don't go left past the first image
+          slider.style.transform = `translateX(-${currentPosition}px)`;
+        });
+
+        // Next button click event
+        nextBtn.addEventListener("click", () => {
+          const maxPosition = (totalSlides - visibleSlides()) * slideWidth();
+
+          // Ensure we don't overshoot the last image, ensuring it's fully visible
+          currentPosition = Math.min(
+            currentPosition + slideWidth(),
+            maxPosition + slideWidth() // Add one extra slide width to ensure the last image isn't cut off
+          );
+          slider.style.transform = `translateX(-${currentPosition}px)`;
+        });
+
+        // Automatically adjust the slider on window resize
+        window.addEventListener("resize", () => {
+          slider.style.transform = `translateX(-${currentPosition}px)`;
+        });
+      } else {
+        console.log("This artist does not have any other artworks.");
+      }
+    });
   });
 }
 
 fetchData(productId);
-
-document.getElementById("favorites").addEventListener("click", () => {
-  location.href = `fav.html`;
-});
 
 // // Function to fetch a random artwork
 // function fetchRandomArtwork() {
@@ -198,6 +300,10 @@ document.getElementById("favorites").addEventListener("click", () => {
 
 // // Fetch the first random artwork when the page loads
 // fetchRandomArtwork();
+
+document.getElementById("favorites").addEventListener("click", () => {
+  location.href = `fav.html?productId=${productId}`;
+});
 
 // Function to fetch and display all artworks by a specific artist (e.g., Vincent van Gogh with artist_id 40482)
 //
